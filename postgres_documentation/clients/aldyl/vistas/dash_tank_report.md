@@ -6,6 +6,7 @@ Unificar en una vista analítica toda la información diaria de tanques Storage,
 Incluye estandarización temporal a America/Caracas y unión de fuentes internas adicionales (int_*).
 
 🧷 Fuentes Utilizadas
+
 Storage Tanks
 
 daily_report_storage_tank
