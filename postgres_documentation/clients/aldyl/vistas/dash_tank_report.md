@@ -1,5 +1,5 @@
 Documentación de Vistas en PostgreSQL
-### 📌 Vista: public.dash_tank_report
+#📌 Vista: public.dash_tank_report
 🎯 Objetivo
 
 Unificar en una vista analítica toda la información diaria de tanques Storage, Settlement y Flow Station, calculando volumen, nivel, producción bruta, producción neta ajustada por AYS y variables de calidad.
@@ -7,7 +7,7 @@ Incluye estandarización temporal a America/Caracas y unión de fuentes internas
 
 🧷 Fuentes Utilizadas
 
-# Storage Tanks
+## Storage Tanks
 
 daily_report_storage_tank
 
@@ -19,7 +19,7 @@ field
 
 lab_report (facility_type = 'storage_tank')
 
-#Settlement Tanks
+## Settlement Tanks
 
 daily_report_dynamic_settlement_tank
 
@@ -31,7 +31,7 @@ field
 
 lab_report (facility_type = 'dynamic_settlement_tank')
 
-#Flow Station Tanks
+## Flow Station Tanks
 
 daily_report_flow_station_tank
 
@@ -45,7 +45,7 @@ treatment_plant
 
 lab_report (facility_type = 'flow_station_tank')
 
-#Fuentes Internas Unificadas
+## Fuentes Internas Unificadas
 
 int_filling_pm2_daily
 
@@ -53,7 +53,7 @@ int_vaccum_load
 
 int_upt_production
 
-🧠 Lógica Principal
+# 🧠 Lógica Principal
 1️⃣ Normalización Temporal
 
 Todos los date_created se convierten de UTC → America/Caracas usando AT TIME ZONE.
