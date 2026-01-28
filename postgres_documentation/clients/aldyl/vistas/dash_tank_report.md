@@ -153,7 +153,7 @@ Las vistas internas int_* deben venir ya estandarizadas.
 Al usar UNION ALL, la vista no deduplica registros.
 
 ## 📐 Actual SQL Script
-
+```sql
 CREATE OR REPLACE VIEW public.dash_tank_report
 AS WITH storage_tank AS (
          SELECT tpdst.id AS tank_id,
@@ -461,3 +461,4 @@ UNION ALL
     int_upt_production.lag,
     int_upt_production.salt_amount
    FROM int_upt_production;
+```
