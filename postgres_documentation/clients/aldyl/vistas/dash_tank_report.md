@@ -53,12 +53,12 @@ int_vaccum_load
 
 int_upt_production
 
-# 🧠 Lógica Principal
-1️⃣ Normalización Temporal
+## 🧠 Lógica Principal
+### 1️⃣ Normalización Temporal
 
 Todos los date_created se convierten de UTC → America/Caracas usando AT TIME ZONE.
 
-2️⃣ Cálculo de Volumen y Nivel
+### 2️⃣ Cálculo de Volumen y Nivel
 
 Storage Tanks
 
@@ -75,7 +75,7 @@ level = tank_level
 
 volume = tank_level × conversion_factor
 
-3️⃣ Producción Bruta (gross_production)
+### 3️⃣ Producción Bruta (gross_production)
 
 Se usa delta contra la lectura anterior:
 lag(...) OVER (PARTITION BY tank ORDER BY date_created)
@@ -90,7 +90,7 @@ PC-1 → usa delta de tank_level
 
 Otros → normaliza por días transcurridos si existen gaps (delta / days_diff)
 
-4️⃣ Producción Neta (net_production)
+### 4️⃣ Producción Neta (net_production)
 
 Fórmula base:
 net = gross_production × (1 – ays/100)
@@ -101,7 +101,7 @@ Si net_operated_production existe → prioridad
 
 Si solo hay raw_operated_production → se usa y se ajusta por AYS si corresponde
 
-5️⃣ Unión de Fuentes
+### 5️⃣ Unión de Fuentes
 
 La vista final usa UNION ALL para unir 6 subconjuntos:
 
@@ -119,7 +119,7 @@ int_upt_production
 
 Esto permite un dataset “wide” estandarizado.
 
-📊 Campos Principales del Resultado
+## 📊 Campos Principales del Resultado
 Campo	Descripción
 tank_id	ID del tanque.
 tank_name	Nombre del tanque.
@@ -138,7 +138,7 @@ tank_type	Tipo de tanque: Storage, Settlement o Flow.
 flow_station	Estación de flujo (solo Flow).
 lag	Lectura anterior utilizada para calcular deltas.
 salt_amount	Cantidad de sal (si aplica).
-⚠️ Suposiciones y Consideraciones
+## ⚠️ Suposiciones y Consideraciones
 
 La producción negativa siempre se trunca a 0.
 
@@ -150,6 +150,6 @@ Las vistas internas int_* deben venir ya estandarizadas.
 
 Al usar UNION ALL, la vista no deduplica registros.
 
-📐 3. Lógica BI (Metabase)
+## 📐 3. Lógica BI (Metabase)
 
 (Si me dices los dashboards exactos que consumen esta vista, te agrego esta sección con métricas, filtros, cálculos personalizados y dependencias.)
