@@ -1,5 +1,5 @@
 Documentación de Vistas en PostgreSQL
-#📌 Vista: public.dash_tank_report
+# 📌 Vista: public.dash_tank_report
 🎯 Objetivo
 
 Unificar en una vista analítica toda la información diaria de tanques Storage, Settlement y Flow Station, calculando volumen, nivel, producción bruta, producción neta ajustada por AYS y variables de calidad.
