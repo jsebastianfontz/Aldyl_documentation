@@ -1,4 +1,3 @@
-Documentación de Vistas en PostgreSQL
 # 📌 Vista: public.dash_tank_report
 ## 🎯 Objetivo
 
@@ -462,3 +461,20 @@ UNION ALL
     int_upt_production.salt_amount
    FROM int_upt_production;
 ```
+## 🧱 Grano / Nivel de detalle (Grain)
+
+- **1 fila por**: `tank_id` + `date_created` **por cada fuente** (Storage / Settlement / Flow / int_*).
+- Al usar `UNION ALL`, puede existir más de una fila para el mismo `tank_id` y fecha si distintas fuentes reportan el mismo tanque o si la granularidad difiere.
+
+## ✅ Reglas de Prioridad (Producción) – Flow Station
+
+Para Flow Station, los cálculos siguen esta prioridad:
+
+- **Producción bruta (`gross_production`)**
+  1. Si existe `raw_operated_production` → se usa directamente.
+  2. Si no existe → se calcula por delta de niveles con reglas por estación (`PM-2`, `PC-1`, otros con normalización por días si hay gaps).
+
+- **Producción neta (`net_production`)**
+  1. Si existe `net_operated_production` → se usa directamente.
+  2. Si existe `raw_operated_production` → se ajusta por AYS (si aplica).
+  3. Si no existe producción operada → se usa el cálculo por delta y se ajusta por AYS (si aplica).
