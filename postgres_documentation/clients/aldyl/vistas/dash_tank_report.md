@@ -120,24 +120,26 @@ int_upt_production
 Esto permite un dataset “wide” estandarizado.
 
 ## 📊 Campos Principales del Resultado
-Campo	Descripción
-tank_id	ID del tanque.
-tank_name	Nombre del tanque.
-status	Estado del tanque en el reporte.
-date_created	Timestamp del reporte (America/Caracas).
-field_name	Campo petrolero asociado.
-tp_name	Planta de tratamiento asociada.
-volume	Volumen reportado o calculado.
-level	Nivel o interface level del tanque.
-gross_production	Producción bruta diaria.
-ays	% Agua y Sedimentos.
-api	API del crudo.
-net_production	Producción neta ajustada por AYS.
-tope	Tope del tanque (solo Storage).
-tank_type	Tipo de tanque: Storage, Settlement o Flow.
-flow_station	Estación de flujo (solo Flow).
-lag	Lectura anterior utilizada para calcular deltas.
-salt_amount	Cantidad de sal (si aplica).
+| Campo             | Descripción                                      |
+|-------------------|--------------------------------------------------|
+| tank_id           | ID del tanque.                                  |
+| tank_name         | Nombre del tanque.                              |
+| status            | Estado del tanque en el reporte.                |
+| date_created      | Timestamp del reporte (America/Caracas).        |
+| field_name        | Campo petrolero asociado.                       |
+| tp_name           | Planta de tratamiento asociada.                 |
+| volume            | Volumen reportado o calculado.                  |
+| level             | Nivel o interface level del tanque.             |
+| gross_production  | Producción bruta diaria.                        |
+| ays               | % Agua y Sedimentos.                            |
+| api               | API del crudo.                                  |
+| net_production    | Producción neta ajustada por AYS.               |
+| tope              | Tope del tanque (solo Storage).                 |
+| tank_type         | Tipo de tanque: Storage, Settlement o Flow.     |
+| flow_station      | Estación de flujo (solo Flow).                  |
+| lag               | Lectura anterior utilizada para calcular deltas.|
+| salt_amount       | Cantidad de sal (si aplica).                    |
+
 ## ⚠️ Suposiciones y Consideraciones
 
 La producción negativa siempre se trunca a 0.
