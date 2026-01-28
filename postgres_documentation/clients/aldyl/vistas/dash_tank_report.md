@@ -1,9 +1,11 @@
-Vista: public.dash_tank_report
-Objetivo
+🗄️ 2. Documentación de Vistas en PostgreSQL
+### 📌 Vista: public.dash_tank_report
+🎯 Objetivo
 
-Unificar en una sola vista la información diaria de tanques Storage, Settlement y Flow Station, calculando volumen, nivel, producción bruta, producción neta ajustada por AYS, y variables de calidad. Provee un dataset listo para BI, con timestamps normalizados a America/Caracas.
+Unificar en una vista analítica toda la información diaria de tanques Storage, Settlement y Flow Station, calculando volumen, nivel, producción bruta, producción neta ajustada por AYS y variables de calidad.
+Incluye estandarización temporal a America/Caracas y unión de fuentes internas adicionales (int_*).
 
-Fuentes
+🧷 Fuentes Utilizadas
 Storage Tanks
 
 daily_report_storage_tank
@@ -42,7 +44,7 @@ treatment_plant
 
 lab_report (facility_type = 'flow_station_tank')
 
-Fuentes internas unificadas
+Fuentes Internas Unificadas
 
 int_filling_pm2_daily
 
@@ -50,44 +52,57 @@ int_vaccum_load
 
 int_upt_production
 
-Lógica Principal
-1. Normalización temporal
+🧠 Lógica Principal
+1️⃣ Normalización Temporal
 
-Conversión de date_created desde UTC → America/Caracas.
+Todos los date_created se convierten de UTC → America/Caracas usando AT TIME ZONE.
 
-2. Cálculo de volumen y nivel
+2️⃣ Cálculo de Volumen y Nivel
 
-Storage: usa volume; si es nulo, deriva de level × conversion_factor.
+Storage Tanks
 
-Settlement: calcula volume usando alturas (ft/in/sixteenths) × conversion_factor.
+Si volume viene nulo → se deriva de level × conversion_factor.
 
-Flow: nivel = tank_level; volumen = tank_level × conversion_factor.
+Settlement Tanks
 
-3. Producción bruta (gross_production)
+volume se calcula a partir de alturas:
+(ft + in/12 + sixteenths/192) × conversion_factor
 
-En Storage/Settlement → delta contra la lectura anterior (lag()), truncado a 0.
+Flow Station Tanks
 
-En Flow Station:
+level = tank_level
 
-Si existe raw_operated_production, se usa directamente.
+volume = tank_level × conversion_factor
 
-Casos particulares para estaciones PM-2, PC-1 y otras.
+3️⃣ Producción Bruta (gross_production)
 
-En estaciones no PM-2/PC-1: si hay salto de días → delta normalizado / días transcurridos.
+Se usa delta contra la lectura anterior:
+lag(...) OVER (PARTITION BY tank ORDER BY date_created)
 
-4. Producción neta (net_production)
+Se aplica GREATEST(0, …) para truncar negativos.
 
-Base: bruta × (1 – AYS/100).
+Flow Station tiene reglas especiales:
 
-Si ays es 0 o NULL → neta = bruta.
+PM-2 → usa filling_start_level - lag(filling_end_level)
 
-Si existe net_operated_production → tiene prioridad.
+PC-1 → usa delta de tank_level
 
-Si existe raw_operated_production y no neta → se ajusta con AYS.
+Otros → normaliza por días transcurridos si existen gaps (delta / days_diff)
 
-5. Unión de fuentes
+4️⃣ Producción Neta (net_production)
 
-El resultado final une 6 conjuntos de datos usando UNION ALL:
+Fórmula base:
+net = gross_production × (1 – ays/100)
+
+Si ays es NULL o 0 → net = gross
+
+Si net_operated_production existe → prioridad
+
+Si solo hay raw_operated_production → se usa y se ajusta por AYS si corresponde
+
+5️⃣ Unión de Fuentes
+
+La vista final usa UNION ALL para unir 6 subconjuntos:
 
 storage_tank
 
@@ -101,50 +116,39 @@ int_vaccum_load
 
 int_upt_production
 
-Esto permite que el reporte final tenga una estructura uniforme.
+Esto permite un dataset “wide” estandarizado.
 
-Campos Principales
+📊 Campos Principales del Resultado
 Campo	Descripción
-tank_id	Identificador del tanque.
+tank_id	ID del tanque.
 tank_name	Nombre del tanque.
-status	Estado operativo reportado.
+status	Estado del tanque en el reporte.
 date_created	Timestamp del reporte (America/Caracas).
-field_name	Campo asociado (campo petrolero).
+field_name	Campo petrolero asociado.
 tp_name	Planta de tratamiento asociada.
-volume	Volumen calculado o reportado del tanque.
-level	Lectura de nivel o interface level.
-gross_production	Producción bruta calculada (delta o valor operado).
-ays	% Agua y Sedimentos (Calidad).
+volume	Volumen reportado o calculado.
+level	Nivel o interface level del tanque.
+gross_production	Producción bruta diaria.
+ays	% Agua y Sedimentos.
 api	API del crudo.
 net_production	Producción neta ajustada por AYS.
-tope	Valor de tope (solo Storage; otros orígenes vienen null).
+tope	Tope del tanque (solo Storage).
 tank_type	Tipo de tanque: Storage, Settlement o Flow.
-flow_station	Estación de flujo asociada (solo Flow).
-lag	Lectura anterior usada para cálculos de delta.
-salt_amount	Cantidad de sal medida (si aplica).
-Suposiciones y Consideraciones
+flow_station	Estación de flujo (solo Flow).
+lag	Lectura anterior utilizada para calcular deltas.
+salt_amount	Cantidad de sal (si aplica).
+⚠️ Suposiciones y Consideraciones
 
-Se truncan valores negativos de producción a 0 para evitar falsos negativos en cálculos operativos.
+La producción negativa siempre se trunca a 0.
 
-Storage y Settlement aplican filtro: treatment_plant_id = 1.
+Storage y Settlement están filtrados por treatment_plant_id = 1.
 
-lab_report puede no estar disponible todos los días, lo que deja AYS/API en null.
+lab_report puede no existir para todos los días/tanques → AYS/API pueden quedar null.
 
-Las vistas int_* deben venir ya estandarizadas en su estructura.
+Las vistas internas int_* deben venir ya estandarizadas.
 
-Al usar UNION ALL, pueden existir múltiples registros por tanque y día si diferentes fuentes reportan el mismo tanque.
+Al usar UNION ALL, la vista no deduplica registros.
 
-3. Lógica BI (Metabase)
+📐 3. Lógica BI (Metabase)
 
-Si me cuentas qué dashboards o tarjetas consumen esta vista, te documento esta sección específica del cliente ALDYL.
-Normalmente incluyo:
-
-dashboards → “Tanques diarios”, “Producción total”, “Inventario por campo”, etc.
-
-filtros aplicados
-
-métricas calculadas
-
-columnas usadas en BI
-
-reglas de negocio que Metabase interpreta encima de la vista
+(Si me dices los dashboards exactos que consumen esta vista, te agrego esta sección con métricas, filtros, cálculos personalizados y dependencias.)
