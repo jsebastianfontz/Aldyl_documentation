@@ -1,4 +1,4 @@
-🗄️ 2. Documentación de Vistas en PostgreSQL
+Documentación de Vistas en PostgreSQL
 ### 📌 Vista: public.dash_tank_report
 🎯 Objetivo
 
