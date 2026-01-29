@@ -2,7 +2,7 @@
 
 ## 🎯 Objetivo
 
-Estandarizar y **distribuir (“split”)** la producción asociada a eventos de llenado en **PM-2** (Flow Station) a nivel **diario operativo**, prorrateando el volumen producido por **horas efectivas** dentro de ventanas definidas (12:00–12:00), para integrarlo como dataset diario (compatible con `dash_tank_report`).
+Estandarizar y **distribuir (“split de los tanques de bombeo”)** la producción asociada a eventos de llenado en **PM-2** (Flow Station) a nivel **diario operativo**, prorrateando el volumen producido por **horas efectivas** dentro de ventanas definidas (12:00–12:00), para integrarlo como dataset diario (compatible con `dash_tank_report`).
 
 ---
 
